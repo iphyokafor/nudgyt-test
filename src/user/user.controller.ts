@@ -1,20 +1,28 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { UserService } from './user.service';
-import { CreateUserDto } from './dto/create-user.dto';
+import { CreateUserDto, LoginDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { JoiObjectValidationPipe } from 'src/utils/pipes/validation.pipe';
+import { createUserValidator, LoginValidator } from './validators/user.validator';
+import { CreateUserPipe } from './pipes/user.pipe';
 
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto);
+  @Post('register')
+  async register(@Body(new JoiObjectValidationPipe(createUserValidator), CreateUserPipe) user: CreateUserDto) {
+    return await this.userService.register(user);
   }
 
-  @Get()
-  findAll() {
-    return this.userService.findAll();
+  @Post('login')
+  async login(@Body(new JoiObjectValidationPipe(LoginValidator)) loginDto: LoginDto) {
+    return await this.userService.login(loginDto);
+  }
+
+  @Get('get-users')
+  async findAll() {
+    return await this.userService.findAll();
   }
 
   @Get(':id')
