@@ -1,10 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto, LoginDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { JoiObjectValidationPipe } from 'src/utils/pipes/validation.pipe';
 import { createUserValidator, LoginValidator } from './validators/user.validator';
 import { CreateUserPipe } from './pipes/user.pipe';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
 @Controller('user')
 export class UserController {
@@ -20,6 +21,7 @@ export class UserController {
     return await this.userService.login(loginDto);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('get-users')
   async findAll() {
     return await this.userService.findAll();

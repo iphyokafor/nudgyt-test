@@ -4,7 +4,7 @@ import { Model } from 'mongoose';
 import { AuthService } from 'src/auth/auth.service';
 import { CreateUserDto, LoginDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { User, UserDocument } from './models/user.model';
+import { User } from './models/user.model';
 
 @Injectable()
 export class UserService {
@@ -19,15 +19,6 @@ export class UserService {
       
       const { firstName, lastName, email, password } = createUserDto;
 
-      const checkEmail = await this.findByEmail(email);
-
-      if (checkEmail) {
-        return {
-          status: false,
-          message: 'Email already in use',
-        };
-      }
-
       const hashedPassword = await this.authService.hashPassword(password);
 
       const newUser = await this.userModel.create({
@@ -38,6 +29,7 @@ export class UserService {
       });
 
       const access_token = await this.authService.generateJwt(newUser);
+      
       const savedUser = await newUser.save();
 
       const result = {
@@ -49,6 +41,7 @@ export class UserService {
     } catch (error) {
       throw new BadRequestException(error.message)
     }
+
   }
 
   async login(loginDto: LoginDto) {

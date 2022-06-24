@@ -19,9 +19,11 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   // TODO: Proper Error handling across api
   async validate(payload: any) {    
     const user = await this.userService.findByEmail(payload.email);
+    
     if (!user) {
       throw new UnauthorizedException();
     }
+    
     return user
   }
 }
