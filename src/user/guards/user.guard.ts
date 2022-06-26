@@ -14,7 +14,6 @@ export class UpdateUserGuard implements CanActivate {
       const { id } = request.params;
 
       const foundUser = await this.userService.findById(id);
-      console.log(user)
 
       if (foundUser.id !== user) {
         throw new UnauthorizedException(

@@ -4,4 +4,5 @@ export const envConfiguration = {
   PORT: 'PORT',
   JWT_SECRET_KEY: 'JWT_SECRET_KEY',
   JWT_EXPIRES: 'JWT_EXPIRES',
+  NODE_ENV: 'NODE_ENV',
 };

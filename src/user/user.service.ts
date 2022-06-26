@@ -5,10 +5,10 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+
 import { AuthService } from 'src/auth/auth.service';
 import { LoginDto, UpdateUserProfileDto } from './dto/user.dto';
 import { User } from './models/user.model';
-import { TokenDto } from 'src/auth/dto/token.dto';
 
 @Injectable()
 export class UserService {
@@ -17,7 +17,13 @@ export class UserService {
     private readonly authService: AuthService,
   ) {}
 
+   /**
+   * This method registers a user
+   * @param user
+   * @returns
+   */
   async register(user: User) {
+
     try {
       const { firstName, lastName, email, password } = user;
 
@@ -49,10 +55,18 @@ export class UserService {
     } catch (error) {
       throw new BadRequestException(error.message);
     }
+
   }
 
+   /**
+   * This method enables a user to login
+   * @param data
+   * @returns
+   */
   async login(data: LoginDto) {
+
     try {
+
       const { email, password } = data;
 
       const user = await this.userModel.findOne({
@@ -71,24 +85,34 @@ export class UserService {
       if (!isValidPassword)
         throw new NotFoundException('invalid credentails provided');
 
-        const access_token = await this.authService.generateJwt({user: user.id,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          email: user.email})
+      const access_token = await this.authService.generateJwt({
+        user: user.id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+      });
 
       return {
         status: true,
         message: 'operation successful',
         user,
-        access_token
+        access_token,
       };
+
     } catch (error) {
       throw new BadRequestException(error.message);
     }
+
   }
 
+   /**
+   * This method returns all users
+   * @returns
+   */
   async findAll() {
+
     try {
+
       const result = await this.userModel.find();
 
       return {
@@ -96,57 +120,83 @@ export class UserService {
         message: 'operation successful',
         data: result,
       };
+
     } catch (error) {
       throw new BadRequestException(error.message);
     }
+
   }
 
+   /**
+   * This method searches for a user by email
+   * @param email
+   * @returns
+   */
   async findByEmail(email: string) {
+
     try {
       const user = await this.userModel.findOne({ email });
 
       return user;
+
     } catch (error) {
       console.log('findByEmail', error);
     }
+
   }
 
+   /**
+   * This method updates a user's profile
+   * @param id
+   * @param userData
+   * @returns
+   */
   async updateProfile(
     id: string,
     userData: UpdateUserProfileDto,
-    tokenData: TokenDto,
   ) {
+
     try {
-      const { user } = tokenData;
 
       const foundUser = await this.userModel.findByIdAndUpdate(
         id,
 
-        { ...userData, lastUpdatedBy: user },
+        userData,
 
         {
           new: true,
         },
+
       );
 
       if (!foundUser) throw new NotFoundException('user not found');
 
       return foundUser;
+
     } catch (e) {
       throw new NotFoundException(e.message);
     }
+
   }
 
+  /**
+   * This method searches for a user by id
+   * @param id
+   * @returns
+   */
   async findById(id: string) {
+
     try {
       const foundUser = await this.userModel.findById(id);
 
       if (!foundUser) throw new NotFoundException('user not found');
 
       return foundUser;
+
     } catch (error) {
       throw new BadRequestException(error.message);
     }
+
   }
 
 }

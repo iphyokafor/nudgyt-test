@@ -1,4 +1,5 @@
 import * as Joi from "joi";
+import { Types } from "mongoose";
 
 export const createUserValidator = Joi.object({
     firstName: Joi.string().uppercase().required(),
@@ -17,4 +18,11 @@ export const createUserValidator = Joi.object({
     lastName: Joi.string().uppercase(),
     email: Joi.string().email().forbidden(),
     password: Joi.string().forbidden(),
+  });
+
+  export const objectIdValidator = Joi.string().custom((value, helpers) => {
+    if (Types.ObjectId.isValid(value)) {
+      return value;
+    }
+    throw new Error('please provide a valid object id');
   });

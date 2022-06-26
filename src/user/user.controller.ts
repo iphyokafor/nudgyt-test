@@ -5,19 +5,9 @@ import {
   Body,
   Patch,
   Param,
-  Delete,
   UseGuards,
 } from '@nestjs/common';
-import { UserService } from './user.service';
-import { CreateUserDto, LoginDto, UpdateUserProfileDto } from './dto/user.dto';
-import { JoiObjectValidationPipe } from 'src/utils/pipes/validation.pipe';
-import {
-  createUserValidator,
-  LoginValidator,
-  UpdateUserValidator,
-} from './validators/user.validator';
-import { CreateUserPipe } from './pipes/user.pipe';
-import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+
 import {
   ApiBadRequestResponse,
   ApiBearerAuth,
@@ -27,8 +17,18 @@ import {
   ApiOkResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { TokenDataDecorator } from 'src/utils/decorators/token.decorator';
-import { TokenDto } from 'src/auth/dto/token.dto';
+
+import { UserService } from './user.service';
+import { CreateUserDto, LoginDto, UpdateUserProfileDto } from './dto/user.dto';
+import { JoiObjectValidationPipe, JoiStringValidationPipe } from 'src/utils/pipes/validation.pipe';
+import {
+  createUserValidator,
+  LoginValidator,
+  objectIdValidator,
+  UpdateUserValidator,
+} from './validators/user.validator';
+import { CreateUserPipe } from './pipes/user.pipe';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { UpdateUserGuard } from './guards/user.guard';
 
 @ApiTags('users')
@@ -68,12 +68,11 @@ export class UserController {
   @Patch('update-user-profile/:id')
   @UseGuards(UpdateUserGuard)
   async updateCustomerProfile(
-    @TokenDataDecorator() tokenData: TokenDto,
-    @Param('id') id: string,
+    @Param('id', new JoiStringValidationPipe(objectIdValidator.required())) id: string,
     @Body(new JoiObjectValidationPipe(UpdateUserValidator))
     user: UpdateUserProfileDto,
   ) {
-    await this.userService.updateProfile(id, user, tokenData);
+    await this.userService.updateProfile(id, user);
 
     return {
       message: 'Updated successfully',

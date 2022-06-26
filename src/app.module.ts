@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 
 import { AppController } from './app.controller';
@@ -7,6 +7,7 @@ import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { envConfiguration } from 'config/env.configuration';
+import { TokenMiddleware } from './utils/middlewares/token.middleware';
 
 @Module({
   imports: [
@@ -39,4 +40,12 @@ import { envConfiguration } from 'config/env.configuration';
   providers: [AppService],
 
 })
-export class AppModule {}
+// JWT AUTHENTICATION
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    return consumer.apply(TokenMiddleware).forRoutes({
+      path: '*',
+      method: RequestMethod.ALL,
+    });
+  }
+}
