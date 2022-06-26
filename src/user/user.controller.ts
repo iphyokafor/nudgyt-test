@@ -16,6 +16,7 @@ import {
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiTags,
+  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 
 import { UserService } from './user.service';
@@ -37,9 +38,9 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Post('register')
-  @ApiCreatedResponse({ type: CreateUserDto })
+  @ApiCreatedResponse({ type: CreateUserDto, description: 'Your record has been created succsessfully' })
   @ApiBadRequestResponse()
-  @ApiConflictResponse()
+  @ApiConflictResponse({description: 'This email is already taken'})
   async register(
     @Body(new JoiObjectValidationPipe(createUserValidator), CreateUserPipe)
     user: CreateUserDto,
@@ -48,8 +49,8 @@ export class UserController {
   }
 
   @Post('login')
-  @ApiCreatedResponse({ type: LoginDto })
-  @ApiNotFoundResponse()
+  @ApiCreatedResponse({ type: LoginDto, description: 'You have successfully logged in' })
+  @ApiNotFoundResponse({description: 'Invalid credentials'})
   @ApiBadRequestResponse()
   async login(
     @Body(new JoiObjectValidationPipe(LoginValidator)) loginDto: LoginDto,
@@ -60,13 +61,17 @@ export class UserController {
   @Get('get-users')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiOkResponse({ type: CreateUserDto, isArray: true })
+  @ApiUnauthorizedResponse()
+  @ApiOkResponse({ type: CreateUserDto, isArray: true , description: "Users fetched successfully"})
   async findAll() {
     return await this.userService.findAll();
   }
 
   @Patch('update-user-profile/:id')
   @UseGuards(UpdateUserGuard)
+  @ApiBearerAuth()
+  @ApiOkResponse()
+  @ApiUnauthorizedResponse()
   async updateCustomerProfile(
     @Param('id', new JoiStringValidationPipe(objectIdValidator.required())) id: string,
     @Body(new JoiObjectValidationPipe(UpdateUserValidator))

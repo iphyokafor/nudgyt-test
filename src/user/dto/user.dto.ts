@@ -1,4 +1,5 @@
-import { ApiProperty } from "@nestjs/swagger";
+import { Optional } from "@nestjs/common";
+import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 
 export class CreateUserDto {
     
@@ -13,17 +14,25 @@ export class CreateUserDto {
 
     @ApiProperty()
     password: string;
+
 }
 
 export class LoginDto {
+
     @ApiProperty()
     email: string;
 
     @ApiProperty()
     password: string;
+
 }
 
-export type UpdateUserProfileDto = Omit<
-CreateUserDto,
-  'email' | 'password'
->;
+export class UpdateUserProfileDto {
+
+  @ApiPropertyOptional()
+  firstName: string;
+
+  @ApiPropertyOptional()
+  lastName: string;
+
+}
