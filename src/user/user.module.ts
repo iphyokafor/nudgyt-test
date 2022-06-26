@@ -15,16 +15,6 @@ import { User, UserSchema } from './models/user.model';
         name: User.name,
         useFactory: () => {
           const schema = UserSchema;
-
-          schema.methods.toJSON = function() {
-            const user = this;
-            const userObject = user.toObject();
-            
-            delete userObject.password;
-        
-            return userObject;
-        };
-
           return schema;
         },
       },

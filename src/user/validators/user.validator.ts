@@ -11,3 +11,10 @@ export const createUserValidator = Joi.object({
     email: Joi.string().email().required(),
     password: Joi.string().required(),
   });
+
+  export const UpdateUserValidator = Joi.object({
+    firstName: Joi.string().uppercase(),
+    lastName: Joi.string().uppercase(),
+    email: Joi.string().email().forbidden(),
+    password: Joi.string().forbidden(),
+  });
