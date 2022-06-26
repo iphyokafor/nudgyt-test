@@ -39,6 +39,8 @@ The API provides the following features or endpoints:
 
 This app was built with [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
+Link to - [Postman Documentation](https://documenter.getpostman.com/view/8629267/UzBsHPiw)
+
 Link to - [Swagger Documentation](https://nudgyt-test.herokuapp.com/docs)
 
 Link to Heroku - [Heroku](https://nudgyt-test.herokuapp.com/)
