@@ -1,5 +1,6 @@
 import { Optional } from "@nestjs/common";
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
+import { PaginationDto } from "src/utils/dtos/pagination.dto";
 
 export class CreateUserDto {
     
@@ -36,3 +37,5 @@ export class UpdateUserProfileDto {
   lastName: string;
 
 }
+
+export class UserFilterDto extends PaginationDto {}

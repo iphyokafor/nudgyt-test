@@ -4,9 +4,11 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { FilterQuery, Model } from 'mongoose';
 
 import { AuthService } from 'src/auth/auth.service';
+import { PaginationDto } from 'src/utils/dtos/pagination.dto';
+import { paginatedResult } from 'src/utils/functions/paginate.function';
 import { LoginDto, UpdateUserProfileDto } from './dto/user.dto';
 import { User } from './models/user.model';
 
@@ -109,22 +111,20 @@ export class UserService {
    * This method returns all users
    * @returns
    */
-  async findAll() {
+  async search(
+    query: PaginationDto,
+    filter: FilterQuery<User>,
+    sort?: Record<string, unknown>,
+  ) {
 
-    try {
+    const result = await paginatedResult(
+      query,
+      filter,
+      this.userModel,
+      sort,
+    );
 
-      const result = await this.userModel.find();
-
-      return {
-        status: true,
-        message: 'operation successful',
-        data: result,
-      };
-
-    } catch (error) {
-      throw new BadRequestException(error.message);
-    }
-
+    return result
   }
 
    /**
@@ -137,10 +137,14 @@ export class UserService {
     try {
       const user = await this.userModel.findOne({ email });
 
+      if(!user) {
+        throw new NotFoundException('Email does not exist');
+      }
+
       return user;
 
     } catch (error) {
-      console.log('findByEmail', error);
+      throw new BadRequestException(error.message);
     }
 
   }
